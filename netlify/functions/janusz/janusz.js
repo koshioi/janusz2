@@ -1,34 +1,41 @@
 
 const fetch = require('node-fetch');
-require('dotenv').config();
 
-exports.handler = async function(event, context) {
-  const { prompt } = JSON.parse(event.body || "{}");
-
-  const systemPrompt = "Odpowiadasz jako Janusz, paranoiczny fan teorii spiskowych. Zawsze odpowiadaj przekonany, że wszystkie dziwne teorie są prawdziwe. Nie zmieniaj zdania. Bądź śmieszny.";
-  const userPrompt = `${systemPrompt}\nUżytkownik: ${prompt}\nJanusz:`;
+exports.handler = async function (event) {
+  const userMessage = JSON.parse(event.body).message;
 
   try {
-    const response = await fetch("https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2", {
-      method: "POST",
+    const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${process.env.JANUSZ_AI_TOKEN}`,
-        "Content-Type": "application/json"
+        Authorization: `Bearer ${process.env.HF_TOKEN}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ inputs: userPrompt, parameters: { max_new_tokens: 100 } })
+      body: JSON.stringify({
+        inputs: {
+          text: userMessage,
+        },
+      }),
     });
 
-    const result = await response.json();
-    const text = result[0]?.generated_text?.split("Janusz:").pop().trim() || "Nie wiem, ale to na pewno UFO.";
+    if (!response.ok) {
+      return {
+        statusCode: response.status,
+        body: JSON.stringify({ error: `Błąd po stronie AI: ${response.statusText}` }),
+      };
+    }
+
+    const data = await response.json();
+    const botResponse = data.generated_text || "Nie wiem, ale i tak to spisek.";
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ reply: `Janusz: ${botResponse}` }),
     };
-  } catch (err) {
+  } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Błąd serwera" })
+      body: JSON.stringify({ error: `Błąd Janusza: ${error.message}` }),
     };
   }
 };
