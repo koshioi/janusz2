@@ -1,26 +1,19 @@
 
-const fetch = require('node-fetch');
-
 exports.handler = async function(event, context) {
-  try {
-    const { message } = JSON.parse(event.body);
-    const response = await fetch("https://api-inference.huggingface.co/models/tiiuae/falcon-rw-1b", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inputs: "Użytkownik: " + message + "\nJanusz:" }),
-    });
+  const paranoidReplies = [
+    "Koty to kamery UFO, stary. One wszystko nagrywają.",
+    "Nie ufaj drzewom. Podsłuchują dla rządu.",
+    "Krzyżacy? To byli kosmici w zbrojach. Prawda cię przerazi.",
+    "Chemtrails to tylko wierzchołek góry lodowej.",
+    "Wieża Eiffla to tak naprawdę antena kontrolująca mózgi.",
+    "Pizza hawajska powstała, by rozbić jedność narodową.",
+    "Internet to tylko eksperyment CIA.",
+    "Słonie nie istnieją. To przebrani agenci wywiadu."
+  ];
 
-    const result = await response.json();
-    const text = result?.[0]?.generated_text?.split("Janusz:")[1] || "Coś podejrzanego w tych bitach...";
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ reply: text.trim() })
-    };
-  } catch (e) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ reply: "Błąd generowania odpowiedzi przez AI." })
-    };
-  }
+  const random = paranoidReplies[Math.floor(Math.random() * paranoidReplies.length)];
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ reply: random })
+  };
 };

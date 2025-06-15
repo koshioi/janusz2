@@ -3,48 +3,17 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Janusz AI</title>
+  <title>Janusz Bot</title>
   <style>
-    body { font-family: sans-serif; background: #111; color: #eee; padding: 20px; }
-    #chat { height: 400px; overflow-y: scroll; border: 1px solid #333; padding: 10px; margin-bottom: 10px; background: #222; }
-    #input { width: 100%; padding: 10px; background: #333; border: none; color: #eee; }
-    button { padding: 10px; background: #555; color: white; border: none; }
+    body { font-family: Arial; padding: 20px; }
+    #chat { border: 1px solid #aaa; padding: 10px; height: 300px; overflow-y: scroll; }
+    input { width: 100%; padding: 10px; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h1>Rozmowy z Januszem 🤖</h1>
+  <h2>Rozmowy z Januszem</h2>
   <div id="chat"></div>
-  <input type="text" id="input" placeholder="Zadaj pytanie Januszowi..." autofocus />
-  <script>
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('input');
-
-    async function send(msg) {
-      chat.innerHTML += `<p><b>Ty:</b> ${msg}</p>`;
-      chat.innerHTML += `<p><b>Janusz:</b> pisze...</p>`;
-      chat.scrollTop = chat.scrollHeight;
-
-      const res = await fetch('/.netlify/functions/janusz', {
-        method: 'POST',
-        body: JSON.stringify({ message: msg }),
-      });
-
-      try {
-        const data = await res.json();
-        chat.innerHTML = chat.innerHTML.replace('pisze...', data.reply);
-      } catch (err) {
-        chat.innerHTML = chat.innerHTML.replace('pisze...', 'Błąd połączenia z AI');
-      }
-
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && input.value.trim()) {
-        send(input.value.trim());
-        input.value = '';
-      }
-    });
-  </script>
+  <input type="text" id="userInput" placeholder="Zadaj pytanie Januszowi..." />
+  <script src="script.js"></script>
 </body>
 </html>
