@@ -2,59 +2,48 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Janusz AI</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; }
-    #chat { border: 1px solid #ccc; padding: 20px; height: 400px; overflow-y: scroll; background: #f9f9f9; }
-    #chat p { margin: 5px 0; }
-    #input { width: 80%; padding: 10px; }
-    #send { padding: 10px 20px; }
+    body { font-family: sans-serif; background: #111; color: #eee; padding: 20px; }
+    #chat { height: 400px; overflow-y: scroll; border: 1px solid #333; padding: 10px; margin-bottom: 10px; background: #222; }
+    #input { width: 100%; padding: 10px; background: #333; border: none; color: #eee; }
+    button { padding: 10px; background: #555; color: white; border: none; }
   </style>
 </head>
 <body>
-  <h2>Rozmowy z Januszem 👨‍🔧</h2>
+  <h1>Rozmowy z Januszem 🤖</h1>
   <div id="chat"></div>
-  <input id="input" type="text" placeholder="Zadaj pytanie Januszowi..." autofocus />
-  <button id="send">Wyślij</button>
-
+  <input type="text" id="input" placeholder="Zadaj pytanie Januszowi..." autofocus />
   <script>
     const chat = document.getElementById('chat');
     const input = document.getElementById('input');
-    const sendBtn = document.getElementById('send');
 
-    function append(text, sender = "Ty") {
-      const p = document.createElement('p');
-      p.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      chat.appendChild(p);
+    async function send(msg) {
+      chat.innerHTML += `<p><b>Ty:</b> ${msg}</p>`;
+      chat.innerHTML += `<p><b>Janusz:</b> pisze...</p>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      const res = await fetch('/.netlify/functions/janusz', {
+        method: 'POST',
+        body: JSON.stringify({ message: msg }),
+      });
+
+      try {
+        const data = await res.json();
+        chat.innerHTML = chat.innerHTML.replace('pisze...', data.reply);
+      } catch (err) {
+        chat.innerHTML = chat.innerHTML.replace('pisze...', 'Błąd połączenia z AI');
+      }
+
       chat.scrollTop = chat.scrollHeight;
     }
 
-    async function sendMessage() {
-      const msg = input.value.trim();
-      if (!msg) return;
-      append(msg, "Ty");
-      append("pisze...", "Janusz");
-      input.value = "";
-
-      try {
-        const res = await fetch('/.netlify/functions/janusz', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ msg })
-        });
-        const data = await res.json();
-        chat.lastChild.remove(); // usuwa "pisze..."
-        append(data.response, "Janusz");
-      } catch (e) {
-        chat.lastChild.remove();
-        append("Nie mogę teraz gadać, coś zakłóca fale radiowe...", "Janusz");
-      }
-    }
-
-    sendBtn.onclick = sendMessage;
     input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') sendMessage();
+      if (e.key === 'Enter' && input.value.trim()) {
+        send(input.value.trim());
+        input.value = '';
+      }
     });
   </script>
 </body>
