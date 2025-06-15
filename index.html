@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Rozmowy z Januszem</title>
+</head>
+<body>
+  <h1>Rozmowy z Januszem</h1>
+  <div id="chat"></div>
+  <input type="text" id="input" placeholder="Zadaj pytanie Januszowi..." />
+  <button onclick="send()">Wyślij</button>
+
+  <script>
+    async function send() {
+      const input = document.getElementById('input');
+      const text = input.value;
+      if (!text) return;
+
+      const chat = document.getElementById('chat');
+      chat.innerHTML += "<p><strong>Ty:</strong> " + text + "</p>";
+      chat.innerHTML += "<p><strong>Janusz:</strong> pisze...</p>";
+      input.value = "";
+
+      try {
+        const res = await fetch('/.netlify/functions/janusz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: text })
+        });
+
+        const data = await res.json();
+        chat.innerHTML += "<p><strong>Janusz:</strong> " + data.message + "</p>";
+      } catch (e) {
+        chat.innerHTML += "<p><strong>Janusz:</strong> Błąd: " + e.message + "</p>";
+      }
+    }
+
+    document.getElementById('input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') send();
+    });
+  </script>
+</body>
+</html>
