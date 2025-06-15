@@ -1,29 +1,19 @@
 
-export default async (request) => {
-  if (request.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Tylko POST!" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json" }
-    });
-  }
-
-  let body = await request.json();
-  const prompt = body.prompt || "coś";
-
-  const odpowiedzi = [
-    "To wina iluminatów!",
-    "Gołębie to drony, przecież wiadomo.",
-    "Koty to kamery UFO.",
-    "5G steruje pogodą.",
-    "Krzyżacy to byli kosmici.",
-    `"${prompt}"? Typowe pranie mózgu przez system.`,
-    `"${prompt}"? Znam typa, co tak miał. Skończył w lesie z aluminiową czapką.`
+export default async (req) => {
+  const paranoje = [
+    "Koty to drony sterowane przez CIA.",
+    "5G to broń psychotroniczna. Mówiłem sąsiadowi, to antenę owinął folią.",
+    "Papier toaletowy znika, bo ONI wiedzą, że nadchodzi wielka prawda.",
+    "Księżyc? Makieta z Hollywood. Kubrick to kręcił z NASA.",
+    "Piramidy w Egipcie to stacje paliw dla UFO. Proszę poszukać w Google Earth!",
+    "Nie wierzę w grawitację. To tylko teoria spiskowa Newtona.",
+    "Kiedyś byłem normalny, dopóki nie wypiłem kranówki. Teraz widzę prawdę.",
+    "Każda muszla klozetowa ma mikrofon. Dlatego sikam do zlewu.",
+    "Zamki błyskawiczne to wynalazek masonów. Symbol kontroli."
   ];
-
-  const message = odpowiedzi[Math.floor(Math.random() * odpowiedzi.length)];
-
-  return new Response(JSON.stringify({ message }), {
-    status: 200,
+  const body = await req.json();
+  const losowa = paranoje[Math.floor(Math.random() * paranoje.length)];
+  return new Response(JSON.stringify({ response: losowa }), {
     headers: { "Content-Type": "application/json" }
   });
 };
