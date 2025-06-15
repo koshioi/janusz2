@@ -3,17 +3,21 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Janusz Bot</title>
+  <title>Janusz Chatbot</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    #chat { border: 1px solid #aaa; padding: 10px; height: 300px; overflow-y: scroll; }
-    input { width: 100%; padding: 10px; margin-top: 10px; }
+    body { font-family: sans-serif; background: #111; color: #0f0; padding: 2em; }
+    #chat { max-width: 600px; margin: auto; }
+    .msg { margin-bottom: 1em; }
+    .user { color: #0ff; }
+    .bot { color: #f0f; }
+    input { width: 100%; padding: 0.5em; font-size: 1em; margin-top: 1em; }
   </style>
 </head>
 <body>
-  <h2>Rozmowy z Januszem</h2>
-  <div id="chat"></div>
-  <input type="text" id="userInput" placeholder="Zadaj pytanie Januszowi..." />
+  <div id="chat">
+    <div class="msg bot">Janusz: Czatuj ze mną</div>
+  </div>
+  <input id="input" placeholder="Zadaj pytanie Januszowi..." />
   <script src="script.js"></script>
 </body>
 </html>

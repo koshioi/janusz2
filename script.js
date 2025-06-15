@@ -1,29 +1,38 @@
 
-const input = document.getElementById('userInput');
-const chat = document.getElementById('chat');
+const input = document.getElementById("input");
+const chat = document.getElementById("chat");
 
-input.addEventListener('keydown', async function (e) {
-  if (e.key === 'Enter') {
-    const message = input.value.trim();
-    if (!message) return;
-    chat.innerHTML += `<div><b>Ty:</b> ${message}</div>`;
-    chat.innerHTML += `<div><b>Janusz:</b> pisze...</div>`;
-    input.value = '';
+function appendMsg(sender, text) {
+  const div = document.createElement("div");
+  div.className = "msg " + sender;
+  div.textContent = (sender === "user" ? "Ty: " : "Janusz: ") + text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-    const res = await fetch('/.netlify/functions/janusz', {
-      method: 'POST',
-      body: JSON.stringify({ message }),
+async function sendMessage(text) {
+  appendMsg("user", text);
+  appendMsg("bot", "pisze...");
+
+  try {
+    const res = await fetch("/.netlify/functions/janusz", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text })
     });
+    const data = await res.json();
+    document.querySelectorAll(".bot").pop().textContent = "Janusz: " + (data.text || "coś poszło nie tak");
+  } catch (e) {
+    document.querySelectorAll(".bot").pop().textContent = "Janusz: Błąd połączenia";
+  }
+}
 
-    try {
-      const data = await res.json();
-      const nodes = chat.querySelectorAll("div");
-      nodes[nodes.length - 1].innerHTML = `<b>Janusz:</b> ${data.reply}`;
-    } catch {
-      const nodes = chat.querySelectorAll("div");
-      nodes[nodes.length - 1].innerHTML = `<b>Janusz:</b> Błąd połączenia`;
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const text = input.value.trim();
+    if (text) {
+      sendMessage(text);
+      input.value = "";
     }
-
-    chat.scrollTop = chat.scrollHeight;
   }
 });
